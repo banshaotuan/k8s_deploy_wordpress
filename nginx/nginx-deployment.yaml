@@ -1,0 +1,38 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: wordpress-nginx
+  labels:
+    app: wordpress
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: wordpress-nginx
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: wordpress-nginx
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        #image: nginx:wordpress
+        ports:
+        - containerPort: 80
+          name: wordpress
+        volumeMounts:
+        - mountPath: "/var/www/html"
+          name: nginx-data
+        - mountPath: "/etc/nginx/conf.d/"
+          name: config
+      volumes:
+      - name: nginx-data
+        persistentVolumeClaim:
+          claimName: wp-pcv02
+      - name: config
+        nfs:
+           server: 10.24.12.3
+           path: /home/banshaotuan/nfs/volumes/data/nginx-conf

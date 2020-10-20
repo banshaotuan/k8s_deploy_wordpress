@@ -1,0 +1,33 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: wordpress-php
+  labels:
+    app: wordpress
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: wordpress-php
+      tier: frontend
+  strategy: 
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress-php
+        tier: frontend
+    spec:
+      containers:
+      - name: php
+        image: crunchgeek/php-fpm:7.3-r7
+        ports:
+        - containerPort: 9000
+          name: wordpress
+        volumeMounts:
+        - name: php-data
+          mountPath: "/var/www/html"
+      volumes:
+      - name: php-data
+        persistentVolumeClaim:
+          claimName: wp-pvc01
